@@ -1,0 +1,80 @@
+Step 1: Set Up Your EnvironmentFirst, make sure you have Python installed, and then install the necessary libraries:pip install spacy
+pip install nltk
+pip install scikit-learn
+pip install flask
+python -m spacy download en_core_web_sm
+
+Step 2: Prepare the FAQ DatasetPrepare your FAQ dataset. For simplicity, we'll use a dictionary in this example.
+faq_data = {
+    "What are your hours of operation?": "We are open from 9 AM to 5 PM, Monday to Friday.",
+    "Where are you located?": "We are located at 123 Main Street, Anytown, USA.",
+    "What services do you offer?": "We offer a variety of services including web development, graphic design, and digital marketing.",
+    "How can I contact customer support?": "You can contact customer support via email at support@example.com or call us at (123) 456-7890."
+}
+
+Step 3: Load SpaCy and Train the ModelLoad SpaCy and prepare your model to handle user queries.
+import spacy
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+import numpy as np
+
+# Load SpaCy model
+nlp = spacy.load("en_core_web_sm")
+
+# Extract questions and answers
+questions = list(faq_data.keys())
+answers = list(faq_data.values())
+
+# Vectorize the questions using TF-IDF
+vectorizer = TfidfVectorizer().fit_transform(questions)
+question_vectors = vectorizer.toarray()
+
+Step 4: Implement the Chatbot LogicCreate a function to handle user queries and find the most similar question from the dataset.
+def 
+find_best_match(user_query):
+    user_query_vector = vectorizer.transform([user_query]).toarray()
+    similarities = cosine_similarity(user_query_vector, question_vectors)
+    best_match_index = np.argmax(similarities)
+    best_match_score = similarities[0][best_match_index]
+    if best_match_score > 0.2:  # Threshold for similarity
+        return answers[best_match_index]
+    else:
+        return "I'm sorry, I don't have an answer for that. Please contact support."
+
+def chatbot_response(user_query):
+    user_query_doc = nlp(user_query)
+    if user_query_doc:
+        response = find_best_match(user_query)
+        return response
+    else:
+        return "I didn't understand that. Could you please rephrase?"
+
+Step 5: Create a Simple Web Interface Using FlaskSet up a simple web interface to interact with the chatbot.
+
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
+
+@app.route("/chat", methods=["POST"])
+def chat():
+    user_query = request.json.get("query")
+    response = chatbot_response(user_query)
+    return jsonify({"response": response})
+
+if __name__ == "__main__":
+    app.run(debug=True)
+
+Step 6: Running the Chatbot
+1.Save the script to a file, for example, faq_chatbot.py.
+2.Open your terminal or command prompt.
+3.Navigate to the directory where you saved the script.
+4.Run the script:
+python faq_chatbot.py
+5.Use a tool like curl or Postman to test the chatbot by sending a POST request to
+http://127.0.0.1:5000/chat with a JSON body containing the user query.
+
+Example POST Request
+curl -X POST http://127.0.0.1:5000/chat -H "Content-Type: application/json" -d '{"query": "What services do you offer?"}'
+Expected Response{
+  "response": "We offer a variety of services including web development, graphic design, and digital marketing."
+}
