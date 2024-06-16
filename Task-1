@@ -1,0 +1,32 @@
+Step 1: Set Up Your EnvironmentMake sure you have Python installed on your computer. You will also need the googletrans library, which provides an easy-to-use interface for the Google Translate API.Install the necessary libraries:
+pip install
+googletrans==4.0.0-rc1
+
+Step 2: Write the Translation CodeCreate a Python script that uses the googletrans library to translate text from one language to another.
+
+from googletrans import Translator
+
+def translate_text(text, src_lang='auto', dest_lang='en'):
+    translator = Translator()
+    translation = translator.translate(text, src=src_lang, dest=dest_lang)
+    return translation.text
+
+if __name__ == "__main__":
+    text_to_translate = input("Enter text to translate: ")
+    source_language = input("Enter source language (leave blank for auto-detection): ")
+    destination_language = input("Enter destination language: ")
+
+    source_language = source_language if source_language else 'auto'
+    
+    translated_text = translate_text(text_to_translate, src_lang=source_language, dest_lang=destination_language)
+    print(f"Translated text: {translated_text}")
+
+Step 3: Running the ScriptSave the script to a file, for example, translate_tool.py.Open your terminal or command prompt.Navigate to the directory where you saved the script.Run the script:
+python translate_tool.py
+
+Step 4: Using the ToolWhen prompted, enter the text you want to translate.Specify the source language (optional; if left blank, it will auto-detect).Specify the destination language.
+Example Usage
+Enter text to translate: Hola, ¿cómo estás?
+Enter source language (leave blank for auto-detection): 
+Enter destination language: en
+Translated text: Hello, how are you?
