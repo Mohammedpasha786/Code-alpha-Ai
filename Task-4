@@ -1,0 +1,65 @@
+1.Set Up Your Environment
+Make sure you have Python installed, and then install the necessary libraries:
+pip install opencv-python opencv-python-headless numpy
+pip install torch torchvision # For PyTorch and the YOLOv5 model
+pip install matplotlib  # Optional, for visualization
+
+2: Download the YOLOv5 ModelClone the YOLOv5 repository to get the pre-trained model and utility scripts:
+git clone https://github.com/ultralytics/yolov5
+cd yolov5
+pip install -r requirements.txt
+
+3: Implement Object Detection and TrackingCreate a Python script that uses YOLOv5 for object detection and OpenCV for video stream processing.import cv2
+import torch
+import numpy as np
+from pathlib import Path
+
+# Load YOLOv5 model
+model = torch.hub.load('ultralytics/yolov5', 'yolov5s')  # Load the small version for faster processing
+
+def detect_and_track(video_path):
+    # Open video file or capture device
+    cap = cv2.VideoCapture(video_path)
+
+    while cap.isOpened():
+        ret, frame = cap.read()
+        if not ret:
+            break
+
+        # Convert frame to RGB
+        rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+        # Perform detection
+        results = model(rgb_frame)
+
+        # Get detections
+        detections = results.xyxy[0].cpu().numpy()  # [x1, y1, x2, y2, confidence, class]
+
+        # Loop over detections and draw bounding boxes
+        for detection in detections:
+            x1, y1, x2, y2, confidence, cls = detection
+            if confidence > 0.5:  # Threshold for confidence
+                label = model.names[int(cls)]
+                cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), (0, 255, 0), 2)
+                cv2.putText(frame, f'{label} {confidence:.2f}', (int(x1), int(y1) - 10), 
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2)
+
+        # Display the frame with detections
+        cv2.imshow('Object Detection and Tracking', frame)
+
+        # Exit on 'q' key press
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+
+    cap.release()
+    cv2.destroyAllWindows()
+
+if __name__ == "__main__":
+    video_path = 0  # Use 0 for webcam or provide a path to a video file
+    detect_and_track(video_path)    
+
+4: Running the Detection and Tracking System
+1.Save the script as object_detection_tracking.py.
+2.Run the script:
+python object_detection_tracking.py
+This will open a window displaying the video feed with detected objects highlighted by bounding boxes. Press 'q' to exit the window.
