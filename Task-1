@@ -1,8 +1,3 @@
-Step 1: Set Up Your EnvironmentMake sure you have Python installed on your computer. You will also need the googletrans library, which provides an easy-to-use interface for the Google Translate API.Install the necessary libraries:
-pip install
-googletrans==4.0.0-rc1
-
-Step 2: Write the Translation CodeCreate a Python script that uses the googletrans library to translate text from one language to another.
 
 from googletrans import Translator
 
